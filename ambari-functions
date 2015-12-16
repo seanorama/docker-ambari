@@ -16,6 +16,7 @@ USAGE
 : ${DEBUG:=1}
 : ${SLEEP_TIME:=2}
 : ${DNS_PORT:=53}
+: ${EXPOSE_AMBARI:=false}
 : ${EXPOSE_DNS:=false}
 : ${DRY_RUN:=false}
 
@@ -122,7 +123,11 @@ amb-start-first() {
   if [[ "$EXPOSE_DNS" == "true" ]]; then
      dns_port_command="-p 53:$DNS_PORT/udp"
   fi
-  run-command docker run -d $dns_port_command --name $CONSUL -h $CONSUL.node.dc1.consul $CONSUL_IMAGE -server -bootstrap
+  local ambari_port_command=""
+  if [[ "$EXPOSE_AMBARI" == "true" ]]; then
+     ambari_port_command="-p 8080:8080"
+  fi
+  run-command docker run -d $dns_port_command ${ambari_port_command} --name $CONSUL -h $CONSUL.node.dc1.consul $CONSUL_IMAGE -server -bootstrap
   sleep 5
 
   run-command docker run -d -e BRIDGE_IP=$(get-consul-ip) $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.node.dc1.consul $IMAGE /start-server
