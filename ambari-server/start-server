@@ -2,7 +2,7 @@
 
 : ${BRIDGE_IP:="172.17.42.1"}
 : ${CLOUD_PLATFORM:="none"}
-: ${SEARCH_DOMAINS:=search.consul node.dc1.consul}
+: ${SEARCH_DOMAINS:=service.consul node.dc1.consul}
 
 [[ "TRACE" ]] && set -x
 
