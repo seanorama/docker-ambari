@@ -127,7 +127,7 @@ amb-start-first() {
   if [[ "$EXPOSE_AMBARI" == "true" ]]; then
      ambari_port_command="-p 8080:8080"
   fi
-  run-command docker run -d $dns_port_command --name $CONSUL -h $CONSUL.node.dc1.consul $CONSUL_IMAGE -server -bootstrap
+  run-command docker run -d $dns_port_command $DOCKER_OPTS --name $CONSUL -h $CONSUL.node.dc1.consul $CONSUL_IMAGE -server -bootstrap
   sleep 5
 
   run-command docker run -d -e BRIDGE_IP=$(get-consul-ip) ${ambari_port_command} $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.node.dc1.consul $IMAGE /start-server
