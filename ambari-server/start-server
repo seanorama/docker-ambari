@@ -2,11 +2,18 @@
 
 : ${BRIDGE_IP:="172.17.42.1"}
 : ${CLOUD_PLATFORM:="none"}
+: ${SEARCH_DOMAINS:=search.consul node.dc1.consul}
 
 [[ "TRACE" ]] && set -x
 
 debug() {
   [[ "DEBUG" ]]  && echo "[DEBUG] $@" 1>&2
+}
+
+# sporadically the yum db is corrupted when using overlayfs as storage backend
+cleanup-rpmdb() {
+  rm -f /var/lib/rpm/__db*
+  rpm --rebuilddb
 }
 
 # --dns isn't available for: docker run --net=host
@@ -16,7 +23,7 @@ debug() {
 fix-nameserver() {
   cat>/etc/resolv.conf<<EOF
 nameserver $BRIDGE_IP
-search service.consul node.dc1.consul
+search ${SEARCH_DOMAINS}
 EOF
 }
 
@@ -61,6 +68,7 @@ reorder_dns_lookup() {
 }
 
 main() {
+  cleanup-rpmdb
   fix-nameserver
   reorder_dns_lookup
   config-remote-jdbc

@@ -2,6 +2,7 @@
 
 : ${BRIDGE_IP:="172.17.42.1"}
 : ${CLOUD_PLATFORM:="none"}
+: ${SEARCH_DOMAINS:=search.consul node.dc1.consul}
 
 [[ "TRACE" ]] && set -x
 
@@ -22,7 +23,7 @@ cleanup-rpmdb() {
 local-nameserver() {
   cat>/etc/resolv.conf<<EOF
 nameserver $BRIDGE_IP
-search service.consul node.dc1.consul
+search ${SEARCH_DOMAINS}
 EOF
 }
 
