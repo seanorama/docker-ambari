@@ -94,8 +94,6 @@ ADD gcs-connector-latest-hadoop2.jar /usr/lib/hadoop/lib/
 
 ENV PS1 "[\u@docker-ambari \W]# "
 
-EXPOSE 22
 EXPOSE 8080
-EXPOSE 8443
 
 CMD ["/start-server"]
