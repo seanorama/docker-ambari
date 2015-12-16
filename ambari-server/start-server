@@ -73,6 +73,7 @@ main() {
   reorder_dns_lookup
   config-remote-jdbc
   start_ambari
+  /etc/init.d/sshd start
   while true; do
     sleep 3
     tail -f /var/log/ambari-server/ambari-server.log
