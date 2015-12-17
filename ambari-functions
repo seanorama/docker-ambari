@@ -10,6 +10,8 @@ USAGE
 : ${AMBARI_SERVER_NAME:=${NODE_PREFIX}-server}
 : ${IMAGE:="sequenceiq/ambari:latest"}
 : ${DOCKER_OPTS:=""}
+: ${DC:="dc1"}
+: ${DOMAIN:="consul"}
 : ${CONSUL:="${NODE_PREFIX}-consul"}
 : ${CONSUL_IMAGE:="sequenceiq/consul:v0.5.0-v6"}
 : ${CLUSTER_SIZE:=3}
@@ -127,10 +129,10 @@ amb-start-first() {
   if [[ "$EXPOSE_AMBARI" == "true" ]]; then
      ambari_port_command="-p 8080:8080"
   fi
-  run-command docker run -d $dns_port_command $DOCKER_OPTS --name $CONSUL -h $CONSUL.node.dc1.consul $CONSUL_IMAGE -server -bootstrap
+  run-command docker run -d $dns_port_command $DOCKER_OPTS --name $CONSUL -h $CONSUL.node.$DC.$DOMAIN $CONSUL_IMAGE -server -bootstrap -dc $DC -domain $DOMAIN
   sleep 5
 
-  run-command docker run -d -e BRIDGE_IP=$(get-consul-ip) ${ambari_port_command} $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.node.dc1.consul $IMAGE /start-server
+  run-command docker run -d -e BRIDGE_IP=$(get-consul-ip) ${ambari_port_command} $DOCKER_OPTS --name $AMBARI_SERVER_NAME -h $AMBARI_SERVER_NAME.node.$DC.$DOMAIN $IMAGE /start-server
 
   get-ambari-server-ip
 
@@ -173,7 +175,7 @@ amb-start-node() {
     MORE_OPTIONS="$@"
   fi
 
-  run-command docker run $MORE_OPTIONS -e BRIDGE_IP=$(get-consul-ip) $DOCKER_OPTS --name ${NODE_PREFIX}$NUMBER -h ${NODE_PREFIX}${NUMBER}.node.dc1.consul $IMAGE /start-agent
+  run-command docker run $MORE_OPTIONS -e BRIDGE_IP=$(get-consul-ip) $DOCKER_OPTS --name ${NODE_PREFIX}$NUMBER -h ${NODE_PREFIX}${NUMBER}.node.$DC.$DOMAIN $IMAGE /start-agent
 
   _consul-register-service ${NODE_PREFIX}${NUMBER} $(get-host-ip ${NODE_PREFIX}$NUMBER)
 }
